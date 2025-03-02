@@ -9,6 +9,12 @@ class SCRTypography {
     fontSize: 25, // Material Design 3 convention
     fontWeight: FontWeight.w700,
   );
+  static const TextStyle heading1 = TextStyle(
+    fontFamily: 'SFProDisplay',
+    color: white,
+    fontSize: 22, // Material Design 3 convention
+    fontWeight: FontWeight.w700,
+  );
   static const TextStyle subHeading = TextStyle(
     fontFamily: 'SFProDisplay',
     color: grey,

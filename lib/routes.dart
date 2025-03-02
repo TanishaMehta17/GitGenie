@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gitgenie/auth/screens/login.dart';
 import 'package:gitgenie/auth/screens/register.dart';
-import 'package:gitgenie/screens/home_screen.dart';
+import 'package:gitgenie/gtihub/screens/home_screen.dart';
 
 
 

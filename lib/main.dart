@@ -4,7 +4,8 @@ import 'package:gitgenie/auth/screens/login.dart';
 import 'package:gitgenie/auth/services/authService.dart';
 import 'package:gitgenie/providers/userProvider.dart';
 import 'package:gitgenie/routes.dart';
-import 'package:gitgenie/screens/home_screen.dart';
+import 'package:gitgenie/gtihub/screens/codeFix_Screen.dart';
+import 'package:gitgenie/gtihub/screens/home_screen.dart';
 import 'package:gitgenie/splash_screen.dart';
 import 'package:provider/provider.dart';
 
