@@ -4,6 +4,7 @@ import 'package:gitgenie/common/typography.dart';
 import 'package:gitgenie/gtihub/screens/codeFix_Screen.dart';
 import 'package:gitgenie/gtihub/screens/labelPR.dart';
 import 'package:gitgenie/gtihub/screens/lintCode_Screen.dart';
+import 'package:gitgenie/gtihub/screens/pr_analysis_screen.dart';
 import 'package:gitgenie/gtihub/screens/riskAnalysis_Screen.dart';
 import 'package:gitgenie/gtihub/screens/suggest_reviewer.dart';
 
@@ -21,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
   }
 
   @override
@@ -57,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen>
         controller: _tabController,
         children: [
           _buildHomeContent(),
+          PrAnalysisScreen(),
           SuggestCodeFixScreen(),
           SuggestReviewer(),
           RiskAnalysisScreen(),
@@ -76,10 +78,12 @@ class _HomeScreenState extends State<HomeScreen>
         backgroundColor: primaryColor,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.analytics), label: 'PR-Analysis'),
           BottomNavigationBarItem(icon: Icon(Icons.code), label: 'Code-Fix'),
           BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Reviewer'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.security), label: 'Risk-Analysis'),
+              icon: Icon(Icons.security), label: 'Risk-Check'),
           BottomNavigationBarItem(icon: Icon(Icons.label), label: 'Label PR'),
           BottomNavigationBarItem(
               icon: Icon(Icons.line_style), label: 'Lint Code'),

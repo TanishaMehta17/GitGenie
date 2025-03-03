@@ -4,25 +4,22 @@ import 'package:gitgenie/common/colors.dart';
 import 'package:gitgenie/common/typography.dart';
 import 'package:gitgenie/gtihub/service/githubService.dart';
 
-class LintcodeScreen extends StatefulWidget {
+class PrAnalysisScreen extends StatefulWidget {
   @override
-  _LintcodeScreenState createState() => _LintcodeScreenState();
+  _PrAnalysisScreenState createState() => _PrAnalysisScreenState();
 }
 
-class _LintcodeScreenState extends State<LintcodeScreen> {
+class _PrAnalysisScreenState extends State<PrAnalysisScreen> {
   final TextEditingController _prNumberController = TextEditingController();
   final TextEditingController _repoOwnerController = TextEditingController();
   final TextEditingController _repoNameController = TextEditingController();
   final GithubService githubService = GithubService();
 
+  Map<String, dynamic>? analysisData;
   bool _isLoading = false;
   String errorMessage = "";
-  List<String> lintingSummary = [];
-  List<String>? errors;
-  List<String>? warnings;
-  List<String>? suggestions;
 
-  Future<void> _fetchLintingDetails() async {
+  Future<void> _fetchCodeFixSuggestions() async {
     final String prNumber = _prNumberController.text.trim();
     final String repoOwner = _repoOwnerController.text.trim();
     final String repoName = _repoNameController.text.trim();
@@ -36,25 +33,22 @@ class _LintcodeScreenState extends State<LintcodeScreen> {
 
     setState(() {
       _isLoading = true;
-      lintingSummary = [];
-      errors = warnings = suggestions = null;
+      analysisData = null;
       errorMessage = "";
     });
 
-    githubService.lintCode(
+    githubService.prAnalysis(
       prNumber: prNumber,
       repoOwner: repoOwner,
       repoName: repoName,
-      callback: (success, summary, message, {errors, warnings, suggestions}) {
+      callback: (success, data, message) {
         setState(() {
           _isLoading = false;
           if (success) {
-            lintingSummary = summary;
-            this.errors = errors;
-            this.warnings = warnings;
-            this.suggestions = suggestions;
+            analysisData = data;
             errorMessage = "";
           } else {
+            analysisData = null;
             errorMessage = message;
           }
         });
@@ -82,19 +76,18 @@ class _LintcodeScreenState extends State<LintcodeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle("📝 Code Linting"),
-                  _buildDescription(
-                      "Detects style violations and formatting issues. Ensures the team follows predefined coding standards. Prevents non-compliant code from merging."),
-                  _buildDescription(
-                      "🔴 Prerequisites for Code Linting\n Your GitHub repository must include a .lint.yml file specifying the linting rules.\nA properly configured ESLint for JavaScript projects.\nBy enforcing linting, GitGenie helps prevent inconsistent or low-quality code from making it into the codebase."),
+                  _buildSectionTitle("🔍 Pull Request Analysis"),
+                  _buildDescription("Ensures PRs follow best practices.Validates commit messages for clarity and structure.Identifies updates that might break existing functionality."),
+                  _buildDescription("Enter details below to analyze your PR."),
                   _buildInputField("PR Number", _prNumberController),
                   _buildInputField("Repository Owner", _repoOwnerController),
                   _buildInputField("Repository Name", _repoNameController),
                   SizedBox(height: 20),
                   _buildSubmitButton(),
                   SizedBox(height: 20),
-                  if (errorMessage.isNotEmpty) _buildErrorMessage(),
-                  if (lintingSummary.isNotEmpty) _buildLintingDetails(),
+                  if (analysisData != null) _buildAnalysisSection(),
+                  if (errorMessage.isNotEmpty)
+                    Text(errorMessage, style: TextStyle(color: Colors.red)),
                 ],
               ),
             ),
@@ -103,11 +96,49 @@ class _LintcodeScreenState extends State<LintcodeScreen> {
       ),
     );
   }
+Widget _buildAnalysisSection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _buildSectionTitle("📄 PR Details"),
+      _buildInfoItem("📌 Title", analysisData?["PR Title"] ?? "N/A"),
+      _buildInfoItem("👤 Author", analysisData?["Author"] ?? "N/A"),
+      _buildInfoItem("📝 Changed Files", analysisData?["Changed Files"] ?? "0"),
+      _buildInfoItem("➕ Additions", analysisData?["Additions"] ?? "0"),
+      _buildInfoItem("➖ Deletions", analysisData?["Deletions"] ?? "0"),
+      _buildInfoItem("🔄 Total Changes", analysisData?["Total Changes"] ?? "0"),
+
+      _buildSectionTitle("🧐 Analysis"),
+      _buildInfoItem("🔒 Security Findings", 
+        analysisData?["Security Findings"]?.toString() ?? "None"),
+      _buildInfoItem("⚡ Quality Issues", 
+        analysisData?["Quality Issues"]?.toString() ?? "None"),
+      _buildInfoItem("🏆 Best Practices", 
+        analysisData?["Best Practices"]?.toString() ?? "None"),
+      _buildInfoItem("📈 Improvement Suggestions", 
+        analysisData?["Improvement Suggestions"]?.toString() ?? "None"),
+    ],
+  );
+}
+
 
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Text(title, style: SCRTypography.heading1.copyWith(color: white)),
+    );
+  }
+
+  Widget _buildInfoItem(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: SCRTypography.subHeading.copyWith(color: white)),
+          Text(value, style: TextStyle(color: white70)),
+        ],
+      ),
     );
   }
 
@@ -139,7 +170,7 @@ class _LintcodeScreenState extends State<LintcodeScreen> {
   Widget _buildSubmitButton() {
     return Center(
       child: ElevatedButton(
-        onPressed: _isLoading ? null : _fetchLintingDetails,
+        onPressed: _isLoading ? null : _fetchCodeFixSuggestions,
         style: ElevatedButton.styleFrom(
           backgroundColor: secondaryColor,
           padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -147,40 +178,10 @@ class _LintcodeScreenState extends State<LintcodeScreen> {
         ),
         child: _isLoading
             ? CircularProgressIndicator(color: white)
-            : Text("Run Lint Check", style: TextStyle(color: primaryColor)),
+            : Text("Get Suggestions", style: TextStyle(color: primaryColor)),
       ),
     );
   }
-
-  Widget _buildErrorMessage() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: Text(errorMessage, style: TextStyle(color: Colors.redAccent)),
-    );
-  }
-
-  Widget _buildLintingDetails() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(16),
-      margin: EdgeInsets.only(top: 20),
-      decoration: BoxDecoration(
-        color: Colors.white10,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("🔍 Linting Details:",
-              style: SCRTypography.subHeading.copyWith(color: white)),
-          ...lintingSummary.map(
-              (detail) => Text("• $detail", style: TextStyle(color: white70))),
-        
-        ],
-      ),
-    );
-  }
-
 
   @override
   void dispose() {
