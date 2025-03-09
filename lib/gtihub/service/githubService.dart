@@ -108,48 +108,7 @@ class GithubService {
     }
   }
 
-  Future<void> riskAnalysis({
-    required String prNumber,
-    required String repoOwner,
-    required String repoName,
-    required CallBack callback,
-  }) async {
-    final url = Uri.parse('$uri/review/analyze-risk');
 
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        body: jsonEncode({
-          'owner': repoOwner,
-          'repo': repoName,
-          'prNumber': prNumber,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        Map<String, dynamic> data = jsonDecode(response.body);
-
-        if (data['success'] == true && data.containsKey('riskScore')) {
-          Map<String, dynamic> riskData = data['riskScore'];
-          if (riskData.containsKey('riskScore') &&
-              riskData.containsKey('explanation')) {
-            double riskScore = riskData['riskScore'];
-            String explanation = riskData['explanation'];
-            callback(true, [riskScore.toString(), explanation],
-                "Risk analysis successful.");
-            return;
-          }
-        }
-        callback(false, [], "Risk data not available or incomplete.");
-      } else {
-        callback(false, [], "Error: ${response.statusCode} - ${response.body}");
-      }
-    } catch (e) {
-      print("Exception: $e");
-      callback(false, [], "Failed to connect: $e");
-    }
-  }
 
   Future<void> labelPr({
     required String prNumber,
@@ -312,4 +271,56 @@ class GithubService {
       callback(false, {}, "Failed to connect: $e");
     }
   }
+
+
+  Future<void> riskAnalysis({
+  required String prNumber,
+  required String repoOwner,
+  required String repoName,
+  required Function(bool, List<String>, String) callback,
+}) async {
+  final url = Uri.parse('$uri/review/analyze-risk');
+
+  try {
+    
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode({
+        'owner': repoOwner,
+        'repo': repoName,
+        'prNumber': prNumber,
+      }),
+    );
+
+   
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+
+      if (data['success'] == true && data.containsKey('riskAnalysis')) {
+        Map<String, dynamic> riskData = data['riskAnalysis']; // Fix here
+
+        if (riskData.containsKey('riskScore') &&
+            riskData.containsKey('explanation')) {
+         double riskScore = (riskData['riskScore'] as num).toDouble();
+
+          String explanation = riskData['explanation'];
+
+          callback(true, [riskScore.toString(), explanation], "Risk analysis successful.");
+          return;
+        }
+      }
+   
+      callback(false, [], "Risk data not available or incomplete.");
+    } else {
+      
+      callback(false, [], "Error: ${response.statusCode} - ${response.body}");
+    }
+  } catch (e, stacktrace) {
+    callback(false, [], "Failed to connect: $e");
+  }
+}
+
+
 }

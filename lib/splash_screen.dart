@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gitgenie/auth/screens/login.dart';
 import 'package:gitgenie/common/colors.dart';
 import 'package:gitgenie/common/typography.dart';
-
-
+import 'package:gitgenie/gtihub/screens/home_screen.dart';
+import 'package:lottie/lottie.dart';
 
 class SplashScreen extends StatefulWidget {
   static const routeName = '/splash';
@@ -55,11 +56,11 @@ class _SplashScreenState extends State<SplashScreen>
               builder: (context, child) {
                 return Transform.rotate(
                   angle: _wiggleAnimation.value, // Apply the wiggle effect
-                  // child: Lottie.asset(
-                  //   'assets/lottie/ai_hand_waving.json',
-                  //   height: 350, // Adjust size
-                  //   width: 350,
-                 // ),
+                  child: Lottie.asset(
+                    'assets/lottie/ai_hand_waving.json',
+                    height: 350, // Adjust size
+                    width: 350,
+                  ),
                 );
               },
             ),
@@ -67,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen>
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                "Effortlessly fetch videos, articles, and images tailored to your query in one click!",
+                "Struggling with inefficient pull request (PR) management? GitGenie is here to revolutionize your workflow with AI-driven insights and automation!",
                 textAlign: TextAlign.center,
                 style: SCRTypography.subHeading
                     .copyWith(color: white, fontSize: 18),
@@ -76,8 +77,8 @@ class _SplashScreenState extends State<SplashScreen>
             const SizedBox(height: 30), // Spacing between text and button
             ElevatedButton(
               onPressed: () {
-                // Navigate to the next screen
-                //Navigator.pushNamed(context, HomeScreen.routeName);
+                //Navigate to the next screen
+                Navigator.pushNamed(context, HomeScreen.routeName);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,

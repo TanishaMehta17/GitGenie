@@ -80,7 +80,7 @@ callback(true);
     }
   }
   // get user data
-  void getUserData(
+ void getUserData(
     BuildContext context,
   ) async {
     try {
@@ -90,9 +90,11 @@ callback(true);
       if (token == null) {
         prefs.setString('token', '');
       }
+      
 
-      var tokenRes = await http.get(
-        Uri.parse('$uri/auth/tokenisvalid'),
+
+      var tokenRes = await http.post(
+        Uri.parse('$uri/auth/TokenisValid'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'token': token!
@@ -103,7 +105,7 @@ callback(true);
       print(response);
       if (response == true) {
         http.Response userRes = await http.get(
-          Uri.parse('$uri/auth/getdata'),
+          Uri.parse('$uri/auth/'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'token': token

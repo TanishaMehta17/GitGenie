@@ -10,9 +10,12 @@ class LabelPrScreen extends StatefulWidget {
 }
 
 class _LabelPrScreenState extends State<LabelPrScreen> {
-  final TextEditingController _prNumberController = TextEditingController();
-  final TextEditingController _repoOwnerController = TextEditingController();
-  final TextEditingController _repoNameController = TextEditingController();
+  final TextEditingController _prNumberController =
+      TextEditingController(text: "13");
+  final TextEditingController _repoOwnerController =
+      TextEditingController(text: "TanishaMehta17");
+  final TextEditingController _repoNameController =
+      TextEditingController(text: "Real-Time-Collaboration-Application");
   final GithubService githubService = GithubService();
 
   String? _label;

@@ -3,24 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:gitgenie/common/colors.dart';
 import 'package:gitgenie/common/typography.dart';
 import 'package:gitgenie/gtihub/service/githubService.dart';
-import 'package:flutter/animation.dart';
 
 class RiskAnalysisScreen extends StatefulWidget {
-
   @override
   _RiskAnalysisScreenState createState() => _RiskAnalysisScreenState();
 }
 
 class _RiskAnalysisScreenState extends State<RiskAnalysisScreen>
     with SingleTickerProviderStateMixin {
-  final TextEditingController _prNumberController = TextEditingController();
-  final TextEditingController _repoOwnerController = TextEditingController();
-  final TextEditingController _repoNameController = TextEditingController();
+  final TextEditingController _prNumberController =
+      TextEditingController(text: "13");
+  final TextEditingController _repoOwnerController =
+      TextEditingController(text: "TanishaMehta17");
+  final TextEditingController _repoNameController =
+      TextEditingController(text: "Real-Time-Collaboration-Application");
   final GithubService githubService = GithubService();
 
   bool _isLoading = false;
   double? _riskScore;
   String _explanation = "";
+
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -30,6 +32,9 @@ class _RiskAnalysisScreenState extends State<RiskAnalysisScreen>
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: 2),
+    );
+    _animation = Tween<double>(begin: 0, end: 0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
   }
 
@@ -59,11 +64,14 @@ class _RiskAnalysisScreenState extends State<RiskAnalysisScreen>
         setState(() {
           _isLoading = false;
           if (success && data.isNotEmpty) {
-            double risk = double.tryParse(data[0]) ?? 0.0;
+            double risk = (double.tryParse(data[0]) ?? 0.0) *
+                100; // Convert to percentage
             _riskScore = risk;
             _explanation = data[1];
+
             _animation = Tween<double>(begin: 0, end: risk).animate(
-              CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+              CurvedAnimation(
+                  parent: _animationController, curve: Curves.easeOut),
             );
             _animationController.forward(from: 0);
           } else {
@@ -95,7 +103,8 @@ class _RiskAnalysisScreenState extends State<RiskAnalysisScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildSectionTitle("⚠️ Risk Analysis"),
-                  _buildDescription("Scans PRs for security vulnerabilities and warns about potential risks before merging."),
+                  _buildDescription(
+                      "Scans PRs for security vulnerabilities and warns about potential risks before merging.Your test files will be scanned for potential security vulnerabilities. Make sure your project has necessary test files."),
                   _buildInputField("PR Number", _prNumberController),
                   _buildInputField("Repository Owner", _repoOwnerController),
                   _buildInputField("Repository Name", _repoNameController),
@@ -122,7 +131,8 @@ class _RiskAnalysisScreenState extends State<RiskAnalysisScreen>
   Widget _buildDescription(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
-      child: Text(text, style: SCRTypography.subHeading.copyWith(color: white70)),
+      child:
+          Text(text, style: SCRTypography.subHeading.copyWith(color: white70)),
     );
   }
 
@@ -181,9 +191,15 @@ class _RiskAnalysisScreenState extends State<RiskAnalysisScreen>
                     height: 150,
                     width: 150,
                     child: CircularProgressIndicator(
-                      value: _animation.value / 100,
+                      value: _animation.value / 100, // Normalize to 0-1
                       strokeWidth: 10,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.redAccent),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        _animation.value < 50
+                            ? Colors.greenAccent
+                            : (_animation.value < 75
+                                ? Colors.orangeAccent
+                                : Colors.redAccent),
+                      ),
                       backgroundColor: Colors.white30,
                     ),
                   ),
@@ -197,10 +213,13 @@ class _RiskAnalysisScreenState extends State<RiskAnalysisScreen>
           ),
         ),
         SizedBox(height: 20),
-        Text(
-          _explanation,
-          textAlign: TextAlign.center,
-          style: SCRTypography.subHeading.copyWith(color: white70),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            _explanation,
+            textAlign: TextAlign.center,
+            style: SCRTypography.subHeading.copyWith(color: white70),
+          ),
         ),
       ],
     );

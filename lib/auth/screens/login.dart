@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
       callback: (bool success) {
         if (success) {
           print("Login Successful");
-          Navigator.pushNamed(context, HomeScreen.routeName);
+          Navigator.pushNamed(context, SplashScreen.routeName);
         } else {
           print("Password is Incorrect");
         }
