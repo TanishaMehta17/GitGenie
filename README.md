@@ -23,13 +23,17 @@ GitGenie is an AI-powered tool that enhances pull request (PR) management with s
 
 ## 🚀 Getting Started
 
-### 1. Clone the repository:
-```bash
-git clone https://github.com/TanishaMehta17/GitGenie```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/TanishaMehta17/GitGenie
+2. **Get the dependecy:**
+   ```bash
+   flutter pub get
+   
+3. **Run the project:**
+   ```bash
+   flutter run
 
-## ⚙️ Configuration
-
-Ensure that all required configurations, including API keys and permissions, are properly set up for seamless functionality.
 
 ## 🤝 Contributing
 
